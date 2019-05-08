@@ -263,7 +263,7 @@ public class HeartBeatServer
     
     private void printOutput(String message)
     {
-        outputArea.appendText(message);
+        outputArea.appendText(message + "\n");
     }
 }
 
