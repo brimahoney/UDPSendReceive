@@ -33,8 +33,6 @@ public class UDPSendReceive extends Application
     @Override
     public void start(Stage primaryStage) 
     {
-        server = new HeartBeatServer(outputArea);
-        client = new HeartBeatServer(outputArea);
         ipField = new TextField();
         ipField.setPromptText("Enter IP address of client");
         outputArea = new TextArea();
@@ -77,6 +75,9 @@ public class UDPSendReceive extends Application
         vBox.getChildren().addAll(serverBtn, clientBtn, ipField, outputArea);
         
         Scene scene = new Scene(vBox, 300, 250);
+
+        server = new HeartBeatServer(outputArea);
+        client = new HeartBeatServer(outputArea);        
         
         primaryStage.setTitle("Datagram");
         primaryStage.setScene(scene);
