@@ -7,6 +7,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
@@ -29,11 +30,13 @@ public class HeartBeatServer
     private Thread sendThread;
     private DatagramSocket sendSocket = null;
     private InetAddress sendAddress = null;
+    private InetAddress defaultSendAddress = null;
     private int localSendPort = 58735;
     
     public HeartBeatServer()
     {
-        sendAddress = InetAddress.getLoopbackAddress();
+        defaultSendAddress = InetAddress.getLoopbackAddress();
+        sendAddress = defaultSendAddress;
     }
     
     private Runnable getSendRunnable() 
@@ -134,13 +137,24 @@ public class HeartBeatServer
         sendThread.interrupt();
     }
     
-    public void startSendServer() throws SocketException, IllegalStateException
+    public void startSendServer(String ipAddress) throws SocketException, IllegalStateException
     {
         if(!stopped)
             throw new IllegalStateException("Send server is already running");
        
         stopped = false;
         sendSocket = new DatagramSocket(localSendPort);
+        if(ipAddress.length() > 0)
+        {
+            try 
+            {
+                sendAddress = InetAddress.getByName(ipAddress);
+            }
+            catch (UnknownHostException ex) 
+            {
+                print("", "Unknown host when getting sendAddress: " + ex.getMessage());
+            }
+        }
         
         print("", "Starting send server...");
         sendThread = new Thread(getSendRunnable());
