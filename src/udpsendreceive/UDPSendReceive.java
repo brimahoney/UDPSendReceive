@@ -1,6 +1,8 @@
 package udpsendreceive;
 
+import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
@@ -34,7 +36,14 @@ public class UDPSendReceive extends Application
     public void start(Stage primaryStage) 
     {
         ipField = new TextField();
-        ipField.setPromptText("Enter IP address of client");
+        try
+        {
+            ipField.setPromptText(InetAddress.getLocalHost().toString());
+        }
+        catch (UnknownHostException ex)
+        {
+            Logger.getLogger(UDPSendReceive.class.getName()).log(Level.SEVERE, null, ex);
+        }
         outputArea = new TextArea();
         outputArea.setEditable(false);
         
