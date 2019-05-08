@@ -8,6 +8,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -24,6 +25,7 @@ public class UDPSendReceive extends Application
     private Button serverBtn;
     private Button clientBtn;
     private TextField ipField;
+    private TextArea outputArea;
     
     private boolean serverState = false;
     private boolean clientState = false;
@@ -31,10 +33,13 @@ public class UDPSendReceive extends Application
     @Override
     public void start(Stage primaryStage) 
     {
-        server = new HeartBeatServer();
-        client = new HeartBeatServer();
+        server = new HeartBeatServer(outputArea);
+        client = new HeartBeatServer(outputArea);
         ipField = new TextField();
         ipField.setPromptText("Enter IP address of client");
+        outputArea = new TextArea();
+        outputArea.setEditable(false);
+        
         
         serverBtn = new Button("Start sending");
         clientBtn = new Button("Start receiving");
@@ -69,7 +74,7 @@ public class UDPSendReceive extends Application
          "-fx-border-color: blue;");
         //root.getChildren().add(vBox);
                 
-        vBox.getChildren().addAll(serverBtn, clientBtn, ipField);
+        vBox.getChildren().addAll(serverBtn, clientBtn, ipField, outputArea);
         
         Scene scene = new Scene(vBox, 300, 250);
         

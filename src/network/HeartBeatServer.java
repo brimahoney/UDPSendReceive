@@ -14,18 +14,20 @@ import java.net.UnknownHostException;
 import java.time.Instant;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.scene.control.TextArea;
 
 public class HeartBeatServer
 {
     private boolean stopped = true;
     private volatile Instant lastReceivedTime;
-    private final int heartBeatInterval = 10; // milliseconds
+    private final int heartBeatInterval = 1000; // milliseconds
     
     // Receive
     private Thread receiveThread;
     private DatagramSocket receiveSocket = null;
     private final int receivePort = 49676;
-        
+    private TextArea outputArea;
+    
     // Send
     private Thread sendThread;
     private DatagramSocket sendSocket = null;
@@ -33,10 +35,13 @@ public class HeartBeatServer
     private InetAddress defaultSendAddress = null;
     private int localSendPort = 58735;
     
-    public HeartBeatServer()
+    
+    
+    public HeartBeatServer(TextArea area)
     {
         defaultSendAddress = InetAddress.getLoopbackAddress();
         sendAddress = defaultSendAddress;
+        outputArea = area;
     }
     
     private Runnable getSendRunnable() 
@@ -107,7 +112,8 @@ public class HeartBeatServer
                         
                         HeartBeatMessage message = getObjectFromPacket(packet);
                         print(indents, "Heartbeat message received, payload: " + message.getPayload());
-                                                                        
+                        printOutput("Message: " + message.getPayload());
+                        
                         //Set time to now instead of using time from message
                         updateLastReceivedTime(message.getPayload());
                         //System.out.println("Heartbeat message received, new time: " + getLastReceivedTime());
@@ -253,6 +259,11 @@ public class HeartBeatServer
     private void print(String indents, String message)
     {
         System.out.println(indents + message);
+    }
+    
+    private void printOutput(String message)
+    {
+        outputArea.appendText(message);
     }
 }
 
