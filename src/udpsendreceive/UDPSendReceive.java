@@ -3,8 +3,6 @@ package udpsendreceive;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -12,11 +10,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import network.QuoteClient;
 import network.HeartBeatServer;
 
 public class UDPSendReceive extends Application 
@@ -42,7 +37,8 @@ public class UDPSendReceive extends Application
         }
         catch (UnknownHostException ex)
         {
-            Logger.getLogger(UDPSendReceive.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("Unknown host: " + ex.getMessage());
+            ex.printStackTrace();
         }
         outputArea = new TextArea();
         outputArea.setEditable(false);
@@ -111,11 +107,13 @@ public class UDPSendReceive extends Application
             }
             catch (SocketException ex) 
             {
-                System.out.println("Failed to start server: " + ex.getMessage());
+                System.out.println("A) Failed to start server: " + ex.getMessage());
+                ex.printStackTrace();
             }
             catch (IllegalStateException ex) 
             {
-                System.out.println("Failed to start server: " + ex.getMessage());
+                System.out.println("B) Failed to start server: " + ex.getMessage());
+                ex.printStackTrace();
             }
         }
         else
@@ -140,10 +138,12 @@ public class UDPSendReceive extends Application
             catch (SocketException ex) 
             {
                 System.out.println("A) Failed to start client: " + ex.getMessage());
+                ex.printStackTrace();
             }
             catch (IllegalStateException ex) 
             {
                 System.out.println("B) Failed to start client: " + ex.getMessage());
+                ex.printStackTrace();
             }
         }
         else
