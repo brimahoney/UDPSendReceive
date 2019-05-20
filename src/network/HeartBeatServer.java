@@ -13,6 +13,12 @@ import java.net.UnknownHostException;
 import java.time.Instant;
 import javafx.scene.control.TextArea;
 
+/**
+ * Server that can send and receive UDP HeartBeatMessage messages.  There are 
+ * 2 Threads, one for sending and one for receiving.  Each Thread uses it's own 
+ * socket set up on different ports.  
+ * @author brian.mahoney
+ */
 public class HeartBeatServer
 {
     private boolean stopped = true;
@@ -32,8 +38,10 @@ public class HeartBeatServer
     private InetAddress defaultSendAddress = null;
     private int localSendPort = 58735;
     
-    
-    
+    /**
+     *
+     * @param area
+     */
     public HeartBeatServer(TextArea area)
     {
         defaultSendAddress = InetAddress.getLoopbackAddress();
@@ -41,7 +49,11 @@ public class HeartBeatServer
         outputArea = area;
     }
     
-    private Runnable getSendRunnable() 
+    /**
+     * Gets the Runnable for sending messages
+     * @return an instance of Runnable that sends messages to a specific host/port
+     */
+    private Runnable getSendRunnable(int timeBetweenMessages) 
     {
         Runnable runner = new Runnable()
         {
@@ -54,7 +66,7 @@ public class HeartBeatServer
                 {
                     try 
                     {
-                        Thread.sleep(heartBeatInterval);
+                        Thread.sleep(timeBetweenMessages);
                         byte[] buf = new byte[1024];
 
                         // figure out response
@@ -88,6 +100,10 @@ public class HeartBeatServer
         return runner;
     }
     
+    /**
+     * Gets the Runnable for receiving messages
+     * @return an instance of Runnable that can receive messages
+     */
     private Runnable getReceiveRunnable() 
     {
         Runnable runner = new Runnable()
@@ -109,7 +125,7 @@ public class HeartBeatServer
                         
                         HeartBeatMessage message = getObjectFromPacket(packet);
                         print(indents, "Heartbeat message received, payload: " + message.getPayload());
-                        printOutput("Message: " + message.getPayload());
+                        //printOutput("Message: " + message.getPayload());
                         
                         //Set time to now instead of using time from message
                         updateLastReceivedTime(message.getPayload());
@@ -130,6 +146,11 @@ public class HeartBeatServer
         return runner;
     }
     
+    /**
+     * Stops sending messages.  This will kill the sending thread and close the 
+     * send socket.
+     * @throws IllegalStateException if the server is not running
+     */
     public void stopSendServer() throws IllegalStateException
     {
         if(stopped)
@@ -139,8 +160,15 @@ public class HeartBeatServer
         sendSocket.close();
         sendThread.interrupt();
     }
-    
-    public void startSendServer(String ipAddress) throws SocketException, IllegalStateException
+
+    /**
+     * Starts sending messages to the designated IP Address
+     * @param ipAddress the address to send the messages to
+     * @throws SocketException if socket cannot be created
+     * @throws IllegalStateException if server is already running
+     */
+    public void startSendServer(String ipAddress, int timeBetweenMessages)
+            throws SocketException, IllegalStateException
     {
         if(!stopped)
             throw new IllegalStateException("Send server is already running");
@@ -160,11 +188,16 @@ public class HeartBeatServer
         }
         
         print("", "Starting send server...");
-        sendThread = new Thread(getSendRunnable());
+        sendThread = new Thread(getSendRunnable(timeBetweenMessages));
         sendThread.setDaemon(true);
         sendThread.start();
     }
     
+    /**
+     * Stops receiving messages.  This will kill the receive Thread and close the 
+     * receive Socket
+     * @throws IllegalStateException if the receive server is not running
+     */
     public void stopReceiveServer() throws IllegalStateException
     {
         if(stopped)
@@ -174,6 +207,11 @@ public class HeartBeatServer
         receiveSocket.close();
     }
     
+    /**
+     * Starts receiving messages
+     * @throws SocketException if socket can not be created
+     * @throws IllegalStateException if the receive server is already running
+     */
     public void startReceiveServer() throws SocketException, IllegalStateException
     {
         if(!stopped)
@@ -190,6 +228,12 @@ public class HeartBeatServer
         receiveThread.start();
     }
     
+    /**
+     * Creates a DatagramPacket from the HeartBeatMessage.  The returned packet 
+     * still needs to have a port and address/host set before sending
+     * @param message the HeartBeatMessage to encode in the DatagramPacket
+     * @return the encoded DatagramPacket
+     */
     public DatagramPacket createPacketFromMessage(HeartBeatMessage message)
     {
         //Send objects in datagrams
@@ -213,6 +257,12 @@ public class HeartBeatServer
         return packet;
     }
     
+    /**
+     * Creates a HeartBeatMessage from the DatagramPacket
+     * @param packet the DatagramPacket encoded from a HeartBeatMessage. See
+     * {@link #createPacketFromMessage(network.HeartBeatMessage)}
+     * @return returns a HeartBeatMessage decoded from {@paramref packet}
+     */
     public HeartBeatMessage getObjectFromPacket(DatagramPacket packet)
     {
         //recieve object from packet
@@ -236,6 +286,10 @@ public class HeartBeatServer
         return message;
     }
     
+    /**
+     *
+     * @param instant
+     */
     public synchronized void updateLastReceivedTime(Instant instant)
     {
         boolean wasAfter = false;
@@ -248,6 +302,10 @@ public class HeartBeatServer
         //print("", "Last received changed: " + wasAfter);
     }
     
+    /**
+     *
+     * @return
+     */
     public synchronized Instant getLastReceivedTime()
     {
         return this.lastReceivedTime;

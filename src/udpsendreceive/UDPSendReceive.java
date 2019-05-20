@@ -7,7 +7,10 @@ import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
@@ -22,6 +25,9 @@ public class UDPSendReceive extends Application
     private Button serverBtn;
     private Button clientBtn;
     private TextField ipField;
+    private TextField timeBetweenMessageField;
+    
+    
     private TextArea outputArea;
     
     private boolean serverState = false;
@@ -40,6 +46,10 @@ public class UDPSendReceive extends Application
             System.out.println("Unknown host: " + ex.getMessage());
             ex.printStackTrace();
         }
+        
+        timeBetweenMessageField = new TextField();
+        timeBetweenMessageField.setPromptText("Enter time in milliseconds between messages");
+        
         outputArea = new TextArea();
         outputArea.setEditable(false);
         
@@ -77,7 +87,7 @@ public class UDPSendReceive extends Application
          "-fx-border-color: blue;");
         //root.getChildren().add(vBox);
                 
-        vBox.getChildren().addAll(serverBtn, clientBtn, ipField, outputArea);
+        vBox.getChildren().addAll(serverBtn, clientBtn, ipField, timeBetweenMessageField, outputArea);
         
         Scene scene = new Scene(vBox, 300, 250);
 
@@ -96,14 +106,26 @@ public class UDPSendReceive extends Application
     
     private void toggleServer()
     {
-        this.serverState = !serverState;
-
-        if(serverState)
+        if(!serverState)
         {
-            try 
+            int timeBetweenMessages; // default
+            try
             {
-                String ipAddress = ipField.getText();
-                server.startSendServer(ipAddress);
+                timeBetweenMessages = Integer.parseInt(timeBetweenMessageField.getText());
+            }
+            catch(NumberFormatException nfe)
+            {
+                Alert errorAlert = new Alert(AlertType.NONE, "Please enter a time between messages value", ButtonType.OK);
+                errorAlert.showAndWait();
+                return;
+            }
+            String ipAddress = ipField.getText();
+
+            this.serverState = !serverState;
+            
+            try
+            {
+                server.startSendServer(ipAddress, timeBetweenMessages);
             }
             catch (SocketException ex) 
             {
@@ -119,6 +141,7 @@ public class UDPSendReceive extends Application
         else
         {
             server.stopSendServer();
+            this.serverState = !serverState;
         }
         
         String buttonText = this.serverState ? "Stop sending" : "Start sending";
