@@ -11,6 +11,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
@@ -28,7 +29,7 @@ public class UDPSendReceive extends Application
     private TextField timeBetweenMessageField;
     
     
-    private TextArea outputArea;
+    private Label lastTimeLabel;
     
     private boolean serverState = false;
     private boolean clientState = false;
@@ -50,9 +51,7 @@ public class UDPSendReceive extends Application
         timeBetweenMessageField = new TextField();
         timeBetweenMessageField.setPromptText("Enter time in milliseconds between messages");
         
-        outputArea = new TextArea();
-        outputArea.setEditable(false);
-        
+        lastTimeLabel = new Label("Last Updated Time");
         
         serverBtn = new Button("Start sending");
         clientBtn = new Button("Start receiving");
@@ -87,12 +86,12 @@ public class UDPSendReceive extends Application
          "-fx-border-color: blue;");
         //root.getChildren().add(vBox);
                 
-        vBox.getChildren().addAll(serverBtn, clientBtn, ipField, timeBetweenMessageField, outputArea);
+        vBox.getChildren().addAll(serverBtn, clientBtn, ipField, timeBetweenMessageField, lastTimeLabel);
         
         Scene scene = new Scene(vBox, 300, 250);
 
-        server = new HeartBeatServer(outputArea);
-        client = new HeartBeatServer(outputArea);        
+        server = new HeartBeatServer(lastTimeLabel);
+        client = new HeartBeatServer(lastTimeLabel);        
         
         primaryStage.setTitle("Datagram");
         primaryStage.setScene(scene);
