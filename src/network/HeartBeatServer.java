@@ -47,17 +47,13 @@ public class HeartBeatServer
     private DatagramSocket sendSocket = null;
     private InetAddress sendAddress = null;
     private InetAddress defaultSendAddress = null;
-    private int localSendPort = 58735;
+    private final int localSendPort = 58735;
     
     private Thread heartBeatCheckerThread;
 
     // FIFO queue for incoming messages
-    private ArrayBlockingQueue<HeartBeatMessage> theQueue;
+    private final ArrayBlockingQueue<HeartBeatMessage> theQueue;
 
-    /**
-     *
-     * @param area
-     */
     public HeartBeatServer(Label lastTimeLabel)
     {
         defaultSendAddress = InetAddress.getLoopbackAddress();
@@ -67,6 +63,7 @@ public class HeartBeatServer
         messageCountProperty = new SimpleIntegerProperty(messageCount);
         
         this.lastTimeLabel = lastTimeLabel;
+        /*
         this.lastTimeLabel.textProperty().bind(messageCountProperty.asString());
         
         messageCountProperty.addListener(new ChangeListener()
@@ -77,6 +74,7 @@ public class HeartBeatServer
                 System.out.println("Electric bill has changed!");
             }
         });
+        */
         
         theQueue = new ArrayBlockingQueue<HeartBeatMessage>(10000000, true);
         Thread queueThread = new Thread(getConsumerRunnable());
@@ -391,6 +389,7 @@ public class HeartBeatServer
                         HeartBeatMessage message = theQueue.take();
                         lastReceivedTime = message.getPayload();
                         //lastTimeLabel.setText(lastReceivedTime.toString());
+                        updateLabel();
                         messageCount += 1;
                         //messageCountProperty.setValue(messageCount);
                         count++;
@@ -446,5 +445,16 @@ public class HeartBeatServer
             }
         };
         return runner;
+    }
+    
+    private void updateLabel()
+    {
+        Platform.runLater(new Runnable() 
+        {
+            @Override public void run() 
+            {
+                lastTimeLabel.setText(lastReceivedTime.toString());                    
+            }
+        });
     }
 }
