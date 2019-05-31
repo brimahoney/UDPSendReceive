@@ -15,12 +15,8 @@ import java.time.temporal.ChronoField;
 import java.util.concurrent.ArrayBlockingQueue;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 
 /**
@@ -121,12 +117,14 @@ public class HeartBeatServer
 
                         sendSocket.send(packet);
                         print(indents, "HeartBeat message sent: " + ++count);
-                    } catch (IOException ex)
+                    } 
+                    catch (IOException ex)
                     {
                         if (stopped)
                         {
                             print(indents, "Send: IOException due to stopping server: " + ex.getMessage());
-                        } else
+                        } 
+                        else
                         {
                             print(indents, "Send: IOException: " + ex.getMessage());
                         }
@@ -168,14 +166,9 @@ public class HeartBeatServer
                         receiveSocket.receive(packet);
 
                         HeartBeatMessage message = getObjectFromPacket(packet);
-                        //print(indents, "Heartbeat message received, payload: " + message.getPayload());
-                        //printOutput("Message: " + message.getPayload());
-
-                        //Set time to now instead of using time from message
-                        //updateLastReceivedTime(message.getPayload());
-                        //System.out.println("Heartbeat message received, new time: " + getLastReceivedTime());
                         theQueue.put(message);
-                    } catch (IOException ioe)
+                    }
+                    catch (IOException ioe)
                     {
                         if (stopped)
                         {
@@ -360,14 +353,10 @@ public class HeartBeatServer
      */
     public synchronized void updateLastReceivedTime(Instant instant)
     {
-        boolean wasAfter = false;
         if (instant.isAfter(lastReceivedTime))
         {
             lastReceivedTime = instant;
-            wasAfter = true;
         }
-
-        //print("", "Last received changed: " + wasAfter);
     }
 
     /**
