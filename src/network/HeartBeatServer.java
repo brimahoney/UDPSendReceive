@@ -388,7 +388,6 @@ public class HeartBeatServer
                         
                         HeartBeatMessage message = theQueue.take();
                         lastReceivedTime = message.getPayload();
-                        //lastTimeLabel.setText(lastReceivedTime.toString());
                         updateLabel();
                         messageCount += 1;
                         //messageCountProperty.setValue(messageCount);
