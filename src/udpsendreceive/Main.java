@@ -1,5 +1,6 @@
 package udpsendreceive;
 
+import java.time.Instant;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.value.ObservableValue;
@@ -21,20 +22,20 @@ public class Main
                 public void changed(ObservableValue o, Object oldVal,
                         Object newVal)
                 {
-                    System.out.println("Electric bill has changed!");
+                    System.out.println("Electric bill has changed! - " + Instant.now());
                 }
             });
             
             electricBill.setAmountDue(100.00);
-            Thread.sleep(1000);
+            Thread.sleep(2000);
             electricBill.setAmountDue(200.00);
-                        Thread.sleep(1000);
+                        Thread.sleep(2000);
             electricBill.setAmountDue(300.00);
-            Thread.sleep(1000);
+            Thread.sleep(2000);
             electricBill.setAmountDue(400.00);
-                        Thread.sleep(1000);
+                        Thread.sleep(2000);
             electricBill.setAmountDue(500.00);
-                        Thread.sleep(1000);
+                        Thread.sleep(2000);
         } catch (InterruptedException ex)
         {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);

@@ -1,6 +1,7 @@
 
 package udpsendreceive;
 
+import java.time.Instant;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 
@@ -19,6 +20,7 @@ import javafx.beans.property.SimpleDoubleProperty;
         // Define a setter for the property's value
         public final void setAmountDue(double value)
         {
+            System.out.println("Amount due updated at " + Instant.now());
             amountDue.set(value);
         }
 
